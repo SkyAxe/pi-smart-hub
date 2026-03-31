@@ -9,10 +9,23 @@ function renderCalendar(events) {
     }
 
     for (const [day, dayEvents] of entries) {
-        const header = document.createElement('div');
-        header.className = 'day-header';
-        header.innerText = day;
-        list.appendChild(header);
+        // Split "Samstag, 05.04." into name + date
+        const parts = day.split(', ');
+        const dayName = parts[0];
+        const dayDate = parts[1] || '';
+
+        const row = document.createElement('div');
+        row.className = 'cal-row';
+
+        const labelCol = document.createElement('div');
+        labelCol.className = 'cal-day-label';
+        labelCol.innerHTML = `
+            <div class="cal-day-name">${dayName}</div>
+            ${dayDate ? `<div class="cal-day-date">${dayDate}</div>` : ''}
+        `;
+
+        const eventsCol = document.createElement('div');
+        eventsCol.className = 'cal-events';
 
         dayEvents.forEach(ev => {
             const item = document.createElement('div');
@@ -21,7 +34,11 @@ function renderCalendar(events) {
                 <div class="event-time">${ev.time}</div>
                 <div class="event-title">${ev.title}</div>
             `;
-            list.appendChild(item);
+            eventsCol.appendChild(item);
         });
+
+        row.appendChild(labelCol);
+        row.appendChild(eventsCol);
+        list.appendChild(row);
     }
 }
