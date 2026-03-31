@@ -196,13 +196,6 @@ body {
     border-color: rgba(46,204,113,0.2);
 }
 
-.event-bar {
-    width: 3px;
-    height: 24px;
-    border-radius: 2px;
-    flex-shrink: 0;
-}
-
 .event-time {
     font-size: 0.8rem;
     color: var(--text-mid);

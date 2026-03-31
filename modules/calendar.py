@@ -2,12 +2,15 @@
 import os
 import os.path
 import datetime
+from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
+load_dotenv()
 PARTNER_EMAIL = os.getenv("PARTNER_EMAIL", "")
+PARTNER_MARKER = " [J]"  # Fallback falls Emoji nicht geht
 
 class CalendarModule:
     def __init__(self):
@@ -82,7 +85,7 @@ class CalendarModule:
 
             # Partner suffix
             if is_partner:
-                title = title
+                title = title + " \u2665"
 
             for event_date in all_dates:
                 days_diff = (event_date - today).days
@@ -113,7 +116,7 @@ class CalendarModule:
                 agenda_by_date[date_str]["events"].append({
                     "time": time_str if event_date == all_dates[0] else "↳",
                     "title": display_title,
-                    "color": "#9b59b6" if is_partner else bg_color,
+                    "color": bg_color,
                     "is_partner": is_partner
                 })
 
