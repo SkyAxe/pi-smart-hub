@@ -1,0 +1,257 @@
+<!DOCTYPE  html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Hub Dashboard</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-green: #2ecc71; /* High-contrast green */
+            --text-main: #e0e0e0;
+            --text-dim: #999;
+        }
+
+        body {
+            /* Dark radial gradient with a hint of deep forest green */
+            background: radial-gradient(circle at top left, #0a1a15, #000000);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+            margin: 0;
+            padding: 40px;
+            height: 100vh;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            gap: 50px;
+            height: 100%;
+        }
+
+        /* --- LEFT SIDE: INFO (TIME & WEATHER) --- */
+        .info-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px; /* Added spacing between cards */
+        }
+
+        .clock {
+            font-size: 5.5rem;
+            font-weight: 800;
+            line-height: 1;
+            margin: 0;
+            color: var(--accent-green);
+            letter-spacing: -2px;
+        }
+
+        .date {
+            font-size: 1.8rem;
+            color: var(--text-dim);
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 25px;
+            max-width: 350px;
+        }
+
+        .temp-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .temp-main {
+            font-size: 4rem;
+            font-weight: 700;
+        }
+
+        #weather-icon {
+            width: 80px;
+            height: 80px;
+        }
+
+        .weather-desc {
+            font-size: 1.4rem;
+            color: var(--accent-green);
+            text-transform: capitalize;
+        }
+
+        .sensor-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- RIGHT SIDE: CALENDAR AGENDA --- */
+	.calendar-section {
+            flex: 1.5;
+            overflow-y: auto; /* Just in case you have a very busy week */
+        }
+
+        .day-label {
+            font-size: 0.9rem;
+            color: var(--accent-green);
+            margin: 20px 0 10px 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 5px;
+        }
+
+        .agenda-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .agenda-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .color-tab {
+            width: 5px;
+            height: 25px;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+
+        .time-box {
+            width: 70px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .event-title {
+            font-size: 1.2rem;
+            font-weight: 400;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            right: 40px;
+            font-size: 0.8rem;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="info-section">
+            <div id="clock" class="clock">00:00</div>
+            <div id="date" class="date">L&auml;dt...</div>
+
+            <div class="card">
+                <span class="sensor-label">Leipzig Außen</span>
+                <div class="temp-row">
+                    <span id="temp" class="temp-main">--&deg;</span>
+                    <img id="weather-icon" src="" style="display:none;">
+                </div>
+                <div id="weather-desc" class="weather-desc">Wetter l&auml;dt...</div>
+                <div style="margin-top:10px; font-size: 0.9rem; color: var(--text-dim);">
+                    Gef&uuml;hlt <span id="feels">--</span>&deg; | <span id="humidity">--</span>% Feuchte
+                </div>
+            </div>
+
+            <div class="card">
+                <span class="sensor-label">Innenklima</span>
+                <div class="temp-row">
+                    <div>
+                        <span id="indoor-temp" class="temp-main">--</span><span style="font-size: 2rem; color: var(--accent-green);">&deg;C</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <div id="indoor-hum" style="font-size: 1.8rem; font-weight: 600; color: var(--accent-green);">--%</div>
+                        <div style="font-size: 0.7rem; color: var(--text-dim);">LUFTFEUCHTE</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="calendar-section">
+            <div id="calendar-list" class="agenda-container"></div>
+        </div>
+    </div>
+
+    <div class="footer">DASHBOARD_EXAYKS_V2</div>
+
+    <script>
+        function updateDashboard() {
+            fetch('/api/data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('clock').innerText = data.time;
+                    document.getElementById('date').innerText = data.date;
+
+                    // Outdoor data
+                    document.getElementById('temp').innerHTML = `${data.temp}&deg;`;
+                    document.getElementById('feels').innerText = data.feels_like;
+                    document.getElementById('humidity').innerText = data.humidity;
+                    document.getElementById('weather-desc').innerText = data.news;
+                    
+                    if (data.icon) {
+                        const icon = document.getElementById('weather-icon');
+                        icon.src = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
+                        icon.style.display = "block";
+                    }
+
+                    // Indoor Sensor Data (New Stuff)
+                    document.getElementById('indoor-temp').innerText = data.indoor_temp;
+                    document.getElementById('indoor-hum').innerText = data.indoor_hum + '%';
+		    // Update Grouped Calendar
+                    const calList = document.getElementById('calendar-list');
+                    calList.innerHTML = ''; 
+
+                    // Iterate through the grouped agenda object
+                    for (const [day, events] of Object.entries(data.events)) {
+                        // Create and append day header
+                        const header = document.createElement('div');
+                        header.className = 'day-label';
+                        header.innerText = day;
+                        calList.appendChild(header);
+
+                        // Append events for that day
+                        events.forEach(event => {
+                            const item = document.createElement('div');
+                            item.className = 'agenda-item';
+                            item.innerHTML = `
+                                <div class="color-tab" style="background-color: ${event.color}"></div>
+                                <div class="time-box">${event.time}</div>
+                                <div class="event-title">${event.title}</div>
+                            `;
+                            calList.appendChild(item);
+                        });
+                    }
+                })
+                .catch(err => console.error("Update error:", err));
+        }
+
+        setInterval(updateDashboard, 30000);
+        updateDashboard();
+    </script>
+</body>
+</html>
