@@ -1,6 +1,8 @@
 from flask import Flask, render_template, jsonify
 import datetime
 import os
+import json
+from flask import Response
 from dotenv import load_dotenv
 from modules.weather import WeatherModule
 from modules.calendar import CalendarModule
@@ -21,10 +23,15 @@ def index():
 @app.route('/api/data')
 def get_data():
     weather_data = weather.get_data()
-    events = calendar.get_upcoming_events()
     indoor_data = indoor.get_reading() or {"temp": "--", "hum": "--"}
 
-    return jsonify({
+    try:
+        events = calendar.get_upcoming_events()
+    except Exception as e:
+        print(f"Calendar error: {e}")
+        events = {}
+
+    data = {
         "time": datetime.datetime.now().strftime("%H:%M"),
         "date": datetime.datetime.now().strftime("%A, %b %d"),
         "temp": weather_data["temp"],
@@ -35,7 +42,13 @@ def get_data():
         "icon": weather_data["icon"],
         "news": weather_data["desc"],
         "events": events
-    })
+    }
+
+    # sort_keys=False verhindert alphabetische Sortierung
+    return Response(
+        json.dumps(data, ensure_ascii=False, sort_keys=False),
+        mimetype='application/json'
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
