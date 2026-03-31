@@ -6,201 +6,228 @@
     <title>Smart Hub Dashboard</title>
     <style>
         :root {
-            --bg: #060e0a;
-            --glass-bg: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(255, 255, 255, 0.08);
             --green: #2ecc71;
             --green-dim: #1a7a43;
-            --text: #e8e8e8;
-            --text-dim: #666;
-            --text-mid: #999;
+            --green-glow: rgba(46, 204, 113, 0.12);
+            --glass: rgba(255,255,255,0.03);
+            --glass-border: rgba(255,255,255,0.07);
+            --text: #eaeaea;
+            --text-mid: #888;
+            --text-dim: #444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background: radial-gradient(ellipse at top left, #0a1f14 0%, #060e0a 60%);
+            background: #070d09;
+            background-image:
+                radial-gradient(ellipse 60% 50% at 0% 0%, rgba(20,60,35,0.5) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 100% 100%, rgba(10,30,18,0.4) 0%, transparent 60%);
             color: var(--text);
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             height: 100vh;
             overflow: hidden;
-            padding: 36px 44px;
+            padding: 32px 40px;
         }
 
         .layout {
             display: grid;
-            grid-template-columns: 340px 1fr;
-            gap: 40px;
+            grid-template-columns: 320px 1fr;
+            gap: 32px;
             height: 100%;
         }
 
-        /* ── LEFT COLUMN ── */
+        /* ── LEFT ── */
         .left {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
         }
 
+        .time-block { margin-bottom: 4px; }
+
         .clock {
-            font-size: 6rem;
+            font-size: 5.8rem;
             font-weight: 800;
             color: var(--green);
-            letter-spacing: -3px;
+            letter-spacing: -4px;
             line-height: 1;
+            text-shadow: 0 0 40px rgba(46,204,113,0.3);
         }
 
         .date {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             color: var(--text-mid);
-            margin-bottom: 8px;
+            margin-top: 6px;
+            letter-spacing: 0.3px;
         }
 
         .card {
-            background: var(--glass-bg);
+            background: var(--glass);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 20px 24px;
+            border-radius: 18px;
+            padding: 18px 22px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(46,204,113,0.3), transparent);
         }
 
         .card-label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
-            letter-spacing: 2.5px;
+            letter-spacing: 3px;
             color: var(--text-dim);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
-        /* Weather card */
-        .weather-row {
+        .weather-main {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
         .weather-temp {
-            font-size: 3.2rem;
+            font-size: 3rem;
             font-weight: 700;
-            color: var(--text);
         }
 
         #weather-icon {
-            width: 64px;
-            height: 64px;
+            width: 60px;
+            height: 60px;
             display: none;
+            filter: drop-shadow(0 0 8px rgba(46,204,113,0.2));
         }
 
         .weather-desc {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--green);
-            margin-top: 4px;
+            margin-top: 6px;
             text-transform: capitalize;
         }
 
         .weather-meta {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-dim);
-            margin-top: 6px;
+            margin-top: 5px;
         }
 
-        /* Indoor card */
+        .divider {
+            height: 1px;
+            background: var(--glass-border);
+            margin: 12px 0;
+        }
+
         .indoor-row {
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             justify-content: space-between;
         }
 
         .indoor-temp {
-            font-size: 2.8rem;
+            font-size: 2.6rem;
             font-weight: 700;
-            color: var(--text);
         }
 
-        .indoor-temp span {
-            font-size: 1.4rem;
+        .indoor-temp sup {
+            font-size: 1.1rem;
             color: var(--green);
+            font-weight: 400;
         }
 
-        .indoor-hum {
-            text-align: right;
-        }
+        .indoor-right { text-align: right; }
 
-        .indoor-hum .hum-value {
-            font-size: 2rem;
+        .hum-value {
+            font-size: 1.8rem;
             font-weight: 600;
             color: var(--green);
         }
 
-        .indoor-hum .hum-label {
-            font-size: 0.65rem;
+        .hum-label {
+            font-size: 0.6rem;
             letter-spacing: 2px;
             color: var(--text-dim);
             text-transform: uppercase;
         }
 
-        /* ── RIGHT COLUMN ── */
+        /* ── RIGHT ── */
         .right {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            min-height: 0;
+        }
+
+        .cal-header {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
         }
 
         .calendar-scroll {
-            overflow-y: auto;
             flex: 1;
-            padding-right: 8px;
+            overflow-y: auto;
+            padding-right: 6px;
         }
 
-        /* Custom scrollbar */
-        .calendar-scroll::-webkit-scrollbar { width: 4px; }
+        .calendar-scroll::-webkit-scrollbar { width: 3px; }
         .calendar-scroll::-webkit-scrollbar-track { background: transparent; }
         .calendar-scroll::-webkit-scrollbar-thumb { background: var(--green-dim); border-radius: 4px; }
 
         .day-header {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             color: var(--green);
             text-transform: uppercase;
             letter-spacing: 2.5px;
-            margin: 20px 0 8px 4px;
-            padding-bottom: 6px;
+            padding: 4px 0 8px 0;
+            margin-top: 18px;
             border-bottom: 1px solid var(--glass-border);
         }
 
         .day-header:first-child { margin-top: 0; }
 
         .event-item {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 11px 18px;
             display: flex;
             align-items: center;
             gap: 14px;
-            margin-bottom: 6px;
-            transition: background 0.2s;
+            padding: 10px 16px;
+            margin-top: 6px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            transition: border-color 0.2s, background 0.2s;
+            cursor: default;
         }
 
         .event-item:hover {
-            background: rgba(255,255,255,0.07);
+            background: rgba(46,204,113,0.04);
+            border-color: rgba(46,204,113,0.2);
         }
 
-        .event-dot {
-            width: 4px;
-            height: 28px;
-            border-radius: 3px;
+        .event-bar {
+            width: 3px;
+            height: 24px;
+            border-radius: 2px;
             flex-shrink: 0;
         }
 
         .event-time {
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.8rem;
             color: var(--text-mid);
-            width: 56px;
+            width: 52px;
             flex-shrink: 0;
         }
 
         .event-title {
-            font-size: 1rem;
+            font-size: 0.95rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -208,25 +235,26 @@
 
         .footer {
             position: fixed;
-            bottom: 16px;
-            right: 28px;
-            font-size: 0.7rem;
-            color: #1e3328;
-            letter-spacing: 1px;
+            bottom: 14px;
+            right: 24px;
+            font-size: 0.6rem;
+            color: #1a2e20;
+            letter-spacing: 2px;
         }
     </style>
 </head>
 <body>
 
 <div class="layout">
-    <!-- LEFT -->
     <div class="left">
-        <div id="clock" class="clock">00:00</div>
-        <div id="date" class="date">Lädt...</div>
+        <div class="time-block">
+            <div id="clock" class="clock">00:00</div>
+            <div id="date" class="date">Lädt...</div>
+        </div>
 
         <div class="card">
-            <div class="card-label">Leipzig Außen</div>
-            <div class="weather-row">
+            <div class="card-label">Leipzig · Außen</div>
+            <div class="weather-main">
                 <div id="temp" class="weather-temp">--</div>
                 <img id="weather-icon" src="" alt="">
             </div>
@@ -240,9 +268,9 @@
             <div class="card-label">Innenklima</div>
             <div class="indoor-row">
                 <div class="indoor-temp">
-                    <span id="indoor-temp">--</span><span>°C</span>
+                    <span id="indoor-temp">--</span><sup>°C</sup>
                 </div>
-                <div class="indoor-hum">
+                <div class="indoor-right">
                     <div id="indoor-hum" class="hum-value">--%</div>
                     <div class="hum-label">Luftfeuchte</div>
                 </div>
@@ -250,8 +278,8 @@
         </div>
     </div>
 
-    <!-- RIGHT -->
     <div class="right">
+        <div class="cal-header">Kalender · Upcoming</div>
         <div class="calendar-scroll">
             <div id="calendar-list"></div>
         </div>
@@ -263,17 +291,16 @@
 <script>
     function updateClock() {
         const now = new Date();
-        const time = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-        const date = now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-        document.getElementById('clock').innerText = time;
-        document.getElementById('date').innerText = date;
+        document.getElementById('clock').innerText =
+            now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('date').innerText =
+            now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
     }
 
     function updateDashboard() {
         fetch('/api/data')
             .then(r => r.json())
             .then(data => {
-                // Weather
                 document.getElementById('temp').innerText = data.temp;
                 document.getElementById('feels').innerText = data.feels_like;
                 document.getElementById('humidity').innerText = data.humidity;
@@ -285,17 +312,16 @@
                     icon.style.display = 'block';
                 }
 
-                // Indoor
                 document.getElementById('indoor-temp').innerText = data.indoor_temp;
-                document.getElementById('indoor-hum').innerText = data.indoor_hum === '--' ? '--' : data.indoor_hum + '%';
+                document.getElementById('indoor-hum').innerText =
+                    data.indoor_hum === '--' ? '--' : data.indoor_hum + '%';
 
-                // Calendar
                 const list = document.getElementById('calendar-list');
                 list.innerHTML = '';
 
                 const entries = Object.entries(data.events);
                 if (entries.length === 0) {
-                    list.innerHTML = '<div style="color: var(--text-dim); margin-top: 20px; font-size: 0.9rem;">Keine Termine in den nächsten Tagen</div>';
+                    list.innerHTML = '<div style="color:var(--text-dim);margin-top:20px;font-size:0.85rem;">Keine bevorstehenden Termine</div>';
                     return;
                 }
 
@@ -305,13 +331,13 @@
                     header.innerText = day;
                     list.appendChild(header);
 
-                    events.forEach(event => {
+                    events.forEach(ev => {
                         const item = document.createElement('div');
                         item.className = 'event-item';
                         item.innerHTML = `
-                            <div class="event-dot" style="background:${event.color}"></div>
-                            <div class="event-time">${event.time}</div>
-                            <div class="event-title">${event.title}</div>
+                            <div class="event-bar" style="background:${ev.color}"></div>
+                            <div class="event-time">${ev.time}</div>
+                            <div class="event-title">${ev.title}</div>
                         `;
                         list.appendChild(item);
                     });

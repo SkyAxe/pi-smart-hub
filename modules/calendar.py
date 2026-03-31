@@ -30,7 +30,6 @@ class CalendarModule:
         service = build('calendar', 'v3', credentials=self.creds)
 
         now = datetime.datetime.utcnow().isoformat() + 'Z'
-        # Fetch more events — 50 to be safe
         events_result = service.events().list(
             calendarId='primary', timeMin=now,
             maxResults=50, singleEvents=True,
@@ -39,7 +38,8 @@ class CalendarModule:
         events = events_result.get('items', [])
         colors_list = service.colors().get().execute().get('event', {})
 
-        agenda = {}
+        # Use date string as unique key to avoid collisions
+        agenda_by_date = {}  # "2026-04-07" -> {label, events[]}
         today = datetime.date.today()
         days_de = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
 
@@ -51,26 +51,34 @@ class CalendarModule:
             days_diff = (event_date - today).days
             if days_diff < 0:
                 continue
-            # No hard limit on days — show as many as we have
 
+            # Unique label per date
             if days_diff == 0:
                 day_label = "Heute"
             elif days_diff == 1:
                 day_label = "Morgen"
+            elif days_diff <= 6:
+                day_label = days_de[event_date.weekday()]
             else:
                 day_label = days_de[event_date.weekday()] + ", " + event_date.strftime("%d.%m.")
 
-            if day_label not in agenda:
-                agenda[day_label] = []
+            if date_str not in agenda_by_date:
+                agenda_by_date[date_str] = {"label": day_label, "events": []}
 
             time_str = start_raw[11:16] if 'T' in start_raw else "Ganztag"
             color_id = event.get('colorId')
             bg_color = colors_list.get(color_id, {}).get('background', '#2ecc71')
 
-            agenda[day_label].append({
+            agenda_by_date[date_str]["events"].append({
                 "time": time_str,
                 "title": event.get('summary', 'Kein Titel'),
                 "color": bg_color
             })
+
+        # Sort by date and build final ordered dict
+        agenda = {}
+        for date_str in sorted(agenda_by_date.keys()):
+            entry = agenda_by_date[date_str]
+            agenda[entry["label"]] = entry["events"]
 
         return agenda
