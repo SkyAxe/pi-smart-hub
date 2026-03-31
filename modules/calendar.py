@@ -85,7 +85,7 @@ class CalendarModule:
 
             # Partner suffix
             if is_partner:
-                title = title + " \u2665"
+                title = "\u2665 " + title  
 
             for event_date in all_dates:
                 days_diff = (event_date - today).days

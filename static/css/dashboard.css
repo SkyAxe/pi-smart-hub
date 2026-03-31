@@ -25,7 +25,7 @@ body {
 
 .layout {
     display: grid;
-    grid-template-columns: 380px 1fr;
+    grid-template-columns: 320px 1fr;
     gap: 32px;
     height: 100%;
 }
@@ -35,6 +35,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    justify-content: flex-start;
 }
 
 .clock {
@@ -234,4 +235,36 @@ body {
 .partner-event:hover {
     background: rgba(155, 89, 182, 0.04);
     border-color: rgba(155, 89, 182, 0.3);
+}
+
+.claude-zone {
+    margin-top: auto;
+    background: var(--glass);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 18px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 54px;
+}
+
+.claude-pulse {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #8b5cf6;
+    flex-shrink: 0;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.claude-text {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
 }
