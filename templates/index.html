@@ -200,58 +200,60 @@
     <div class="footer">DASHBOARD_EXAYKS_V2</div>
 
     <script>
-        function updateDashboard() {
-            fetch('/api/data')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('clock').innerText = data.time;
-                    document.getElementById('date').innerText = data.date;
+    // Live clock - updates every second
+    function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        const date = now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+        document.getElementById('clock').innerText = time;
+        document.getElementById('date').innerText = date;
+    }
 
-                    // Outdoor data
-                    document.getElementById('temp').innerHTML = `${data.temp}&deg;`;
-                    document.getElementById('feels').innerText = data.feels_like;
-                    document.getElementById('humidity').innerText = data.humidity;
-                    document.getElementById('weather-desc').innerText = data.news;
-                    
-                    if (data.icon) {
-                        const icon = document.getElementById('weather-icon');
-                        icon.src = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
-                        icon.style.display = "block";
-                    }
+    // Dashboard data - updates every 30 seconds
+    function updateDashboard() {
+        fetch('/api/data')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('temp').innerHTML = `${data.temp}`;
+                document.getElementById('feels').innerText = data.feels_like;
+                document.getElementById('humidity').innerText = data.humidity;
+                document.getElementById('weather-desc').innerText = data.news;
 
-                    // Indoor Sensor Data (New Stuff)
-                    document.getElementById('indoor-temp').innerText = data.indoor_temp;
-                    document.getElementById('indoor-hum').innerText = data.indoor_hum + '%';
-		    // Update Grouped Calendar
-                    const calList = document.getElementById('calendar-list');
-                    calList.innerHTML = ''; 
+                if (data.icon) {
+                    const icon = document.getElementById('weather-icon');
+                    icon.src = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
+                    icon.style.display = "block";
+                }
 
-                    // Iterate through the grouped agenda object
-                    for (const [day, events] of Object.entries(data.events)) {
-                        // Create and append day header
-                        const header = document.createElement('div');
-                        header.className = 'day-label';
-                        header.innerText = day;
-                        calList.appendChild(header);
+                document.getElementById('indoor-temp').innerText = data.indoor_temp;
+                document.getElementById('indoor-hum').innerText = data.indoor_hum + '%';
 
-                        // Append events for that day
-                        events.forEach(event => {
-                            const item = document.createElement('div');
-                            item.className = 'agenda-item';
-                            item.innerHTML = `
-                                <div class="color-tab" style="background-color: ${event.color}"></div>
-                                <div class="time-box">${event.time}</div>
-                                <div class="event-title">${event.title}</div>
-                            `;
-                            calList.appendChild(item);
-                        });
-                    }
-                })
-                .catch(err => console.error("Update error:", err));
-        }
+                const calList = document.getElementById('calendar-list');
+                calList.innerHTML = '';
+                for (const [day, events] of Object.entries(data.events)) {
+                    const header = document.createElement('div');
+                    header.className = 'day-label';
+                    header.innerText = day;
+                    calList.appendChild(header);
+                    events.forEach(event => {
+                        const item = document.createElement('div');
+                        item.className = 'agenda-item';
+                        item.innerHTML = `
+                            <div class="color-tab" style="background-color: ${event.color}"></div>
+                            <div class="time-box">${event.time}</div>
+                            <div class="event-title">${event.title}</div>
+                        `;
+                        calList.appendChild(item);
+                    });
+                }
+            })
+            .catch(err => console.error("Update error:", err));
+    }
 
-        setInterval(updateDashboard, 30000);
-        updateDashboard();
+    setInterval(updateClock, 1000);
+    setInterval(updateDashboard, 30000);
+    updateClock();
+    updateDashboard();
     </script>
 </body>
 </html>

@@ -1,13 +1,16 @@
 from flask import Flask, render_template, jsonify
 import datetime
+import os
+from dotenv import load_dotenv
 from modules.weather import WeatherModule
 from modules.calendar import CalendarModule
 from modules.sensors import IndoorSensor
 
+load_dotenv()
+
 app = Flask(__name__)
 
-# Initialize your modules here
-weather = WeatherModule(city="Leipzig", api_key="af4124db2382f2fc9b0c49b3435ac240")
+weather = WeatherModule(city="Leipzig", api_key=os.getenv("OPENWEATHER_API_KEY"))
 calendar = CalendarModule()
 indoor = IndoorSensor()
 
@@ -25,13 +28,13 @@ def get_data():
         "time": datetime.datetime.now().strftime("%H:%M"),
         "date": datetime.datetime.now().strftime("%A, %b %d"),
         "temp": weather_data["temp"],
-	"indoor_temp": indoor_data["temp"],
-	"indoor_hum": indoor_data["hum"],
-	"feels_like": weather_data["feels_like"], 
-        "humidity": weather_data["humidity"],     
-        "icon": weather_data["icon"],             
+        "indoor_temp": indoor_data["temp"],
+        "indoor_hum": indoor_data["hum"],
+        "feels_like": weather_data["feels_like"],
+        "humidity": weather_data["humidity"],
+        "icon": weather_data["icon"],
         "news": weather_data["desc"],
-	"events": events
+        "events": events
     })
 
 if __name__ == '__main__':
