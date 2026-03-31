@@ -1,4 +1,4 @@
-<!DOCTYPE  html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -6,201 +6,261 @@
     <title>Smart Hub Dashboard</title>
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-green: #2ecc71; /* High-contrast green */
-            --text-main: #e0e0e0;
-            --text-dim: #999;
+            --bg: #060e0a;
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --green: #2ecc71;
+            --green-dim: #1a7a43;
+            --text: #e8e8e8;
+            --text-dim: #666;
+            --text-mid: #999;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            /* Dark radial gradient with a hint of deep forest green */
-            background: radial-gradient(circle at top left, #0a1a15, #000000);
-            color: var(--text-main);
-            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
-            margin: 0;
-            padding: 40px;
+            background: radial-gradient(ellipse at top left, #0a1f14 0%, #060e0a 60%);
+            color: var(--text);
+            font-family: 'Segoe UI', Roboto, sans-serif;
             height: 100vh;
             overflow: hidden;
-            box-sizing: border-box;
+            padding: 36px 44px;
         }
 
-        .container {
-            display: flex;
-            gap: 50px;
+        .layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 40px;
             height: 100%;
         }
 
-        /* --- LEFT SIDE: INFO (TIME & WEATHER) --- */
-        .info-section {
-            flex: 1;
+        /* ── LEFT COLUMN ── */
+        .left {
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            gap: 20px; /* Added spacing between cards */
+            gap: 16px;
         }
 
         .clock {
-            font-size: 5.5rem;
+            font-size: 6rem;
             font-weight: 800;
+            color: var(--green);
+            letter-spacing: -3px;
             line-height: 1;
-            margin: 0;
-            color: var(--accent-green);
-            letter-spacing: -2px;
         }
 
         .date {
-            font-size: 1.8rem;
-            color: var(--text-dim);
-            margin-bottom: 30px;
+            font-size: 1.3rem;
+            color: var(--text-mid);
+            margin-bottom: 8px;
         }
 
         .card {
             background: var(--glass-bg);
-            backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 25px;
-            max-width: 350px;
+            border-radius: 20px;
+            padding: 20px 24px;
         }
 
-        .temp-row {
+        .card-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        /* Weather card */
+        .weather-row {
             display: flex;
             align-items: center;
-            gap: 10px;
             justify-content: space-between;
         }
 
-        .temp-main {
-            font-size: 4rem;
+        .weather-temp {
+            font-size: 3.2rem;
             font-weight: 700;
+            color: var(--text);
         }
 
         #weather-icon {
-            width: 80px;
-            height: 80px;
+            width: 64px;
+            height: 64px;
+            display: none;
         }
 
         .weather-desc {
-            font-size: 1.4rem;
-            color: var(--accent-green);
+            font-size: 1rem;
+            color: var(--green);
+            margin-top: 4px;
             text-transform: capitalize;
         }
 
-        .sensor-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
+        .weather-meta {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-top: 6px;
+        }
+
+        /* Indoor card */
+        .indoor-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .indoor-temp {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .indoor-temp span {
+            font-size: 1.4rem;
+            color: var(--green);
+        }
+
+        .indoor-hum {
+            text-align: right;
+        }
+
+        .indoor-hum .hum-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--green);
+        }
+
+        .indoor-hum .hum-label {
+            font-size: 0.65rem;
             letter-spacing: 2px;
             color: var(--text-dim);
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        /* --- RIGHT SIDE: CALENDAR AGENDA --- */
-	.calendar-section {
-            flex: 1.5;
-            overflow-y: auto; /* Just in case you have a very busy week */
-        }
-
-        .day-label {
-            font-size: 0.9rem;
-            color: var(--accent-green);
-            margin: 20px 0 10px 5px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: bold;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 5px;
         }
 
-        .agenda-container {
+        /* ── RIGHT COLUMN ── */
+        .right {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            overflow: hidden;
         }
 
-        .agenda-item {
+        .calendar-scroll {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 8px;
+        }
+
+        /* Custom scrollbar */
+        .calendar-scroll::-webkit-scrollbar { width: 4px; }
+        .calendar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .calendar-scroll::-webkit-scrollbar-thumb { background: var(--green-dim); border-radius: 4px; }
+
+        .day-header {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin: 20px 0 8px 4px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .day-header:first-child { margin-top: 0; }
+
+        .event-item {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
-            padding: 12px 20px;
+            padding: 11px 18px;
             display: flex;
             align-items: center;
+            gap: 14px;
+            margin-bottom: 6px;
+            transition: background 0.2s;
         }
 
-        .color-tab {
-            width: 5px;
-            height: 25px;
-            border-radius: 4px;
-            margin-right: 15px;
+        .event-item:hover {
+            background: rgba(255,255,255,0.07);
         }
 
-        .time-box {
-            width: 70px;
-            font-size: 1rem;
+        .event-dot {
+            width: 4px;
+            height: 28px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .event-time {
+            font-size: 0.9rem;
             font-weight: 600;
-            color: var(--text-main);
+            color: var(--text-mid);
+            width: 56px;
+            flex-shrink: 0;
         }
 
         .event-title {
-            font-size: 1.2rem;
-            font-weight: 400;
+            font-size: 1rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .footer {
-            position: absolute;
-            bottom: 20px;
-            right: 40px;
-            font-size: 0.8rem;
-            color: #333;
+            position: fixed;
+            bottom: 16px;
+            right: 28px;
+            font-size: 0.7rem;
+            color: #1e3328;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="info-section">
-            <div id="clock" class="clock">00:00</div>
-            <div id="date" class="date">L&auml;dt...</div>
+<div class="layout">
+    <!-- LEFT -->
+    <div class="left">
+        <div id="clock" class="clock">00:00</div>
+        <div id="date" class="date">Lädt...</div>
 
-            <div class="card">
-                <span class="sensor-label">Leipzig Außen</span>
-                <div class="temp-row">
-                    <span id="temp" class="temp-main">--&deg;</span>
-                    <img id="weather-icon" src="" style="display:none;">
-                </div>
-                <div id="weather-desc" class="weather-desc">Wetter l&auml;dt...</div>
-                <div style="margin-top:10px; font-size: 0.9rem; color: var(--text-dim);">
-                    Gef&uuml;hlt <span id="feels">--</span>&deg; | <span id="humidity">--</span>% Feuchte
-                </div>
+        <div class="card">
+            <div class="card-label">Leipzig Außen</div>
+            <div class="weather-row">
+                <div id="temp" class="weather-temp">--</div>
+                <img id="weather-icon" src="" alt="">
             </div>
-
-            <div class="card">
-                <span class="sensor-label">Innenklima</span>
-                <div class="temp-row">
-                    <div>
-                        <span id="indoor-temp" class="temp-main">--</span><span style="font-size: 2rem; color: var(--accent-green);">&deg;C</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <div id="indoor-hum" style="font-size: 1.8rem; font-weight: 600; color: var(--accent-green);">--%</div>
-                        <div style="font-size: 0.7rem; color: var(--text-dim);">LUFTFEUCHTE</div>
-                    </div>
-                </div>
+            <div id="weather-desc" class="weather-desc">Wetter lädt...</div>
+            <div class="weather-meta">
+                Gefühlt <span id="feels">--</span> &nbsp;·&nbsp; <span id="humidity">--</span> Feuchte
             </div>
         </div>
 
-        <div class="calendar-section">
-            <div id="calendar-list" class="agenda-container"></div>
+        <div class="card">
+            <div class="card-label">Innenklima</div>
+            <div class="indoor-row">
+                <div class="indoor-temp">
+                    <span id="indoor-temp">--</span><span>°C</span>
+                </div>
+                <div class="indoor-hum">
+                    <div id="indoor-hum" class="hum-value">--%</div>
+                    <div class="hum-label">Luftfeuchte</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="footer">DASHBOARD_EXAYKS_V2</div>
+    <!-- RIGHT -->
+    <div class="right">
+        <div class="calendar-scroll">
+            <div id="calendar-list"></div>
+        </div>
+    </div>
+</div>
 
-    <script>
-    // Live clock - updates every second
+<div class="footer">SMART HUB · EXAYKS</div>
+
+<script>
     function updateClock() {
         const now = new Date();
         const time = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
@@ -209,12 +269,12 @@
         document.getElementById('date').innerText = date;
     }
 
-    // Dashboard data - updates every 30 seconds
     function updateDashboard() {
         fetch('/api/data')
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
-                document.getElementById('temp').innerHTML = `${data.temp}`;
+                // Weather
+                document.getElementById('temp').innerText = data.temp;
                 document.getElementById('feels').innerText = data.feels_like;
                 document.getElementById('humidity').innerText = data.humidity;
                 document.getElementById('weather-desc').innerText = data.news;
@@ -222,38 +282,48 @@
                 if (data.icon) {
                     const icon = document.getElementById('weather-icon');
                     icon.src = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
-                    icon.style.display = "block";
+                    icon.style.display = 'block';
                 }
 
+                // Indoor
                 document.getElementById('indoor-temp').innerText = data.indoor_temp;
-                document.getElementById('indoor-hum').innerText = data.indoor_hum + '%';
+                document.getElementById('indoor-hum').innerText = data.indoor_hum === '--' ? '--' : data.indoor_hum + '%';
 
-                const calList = document.getElementById('calendar-list');
-                calList.innerHTML = '';
-                for (const [day, events] of Object.entries(data.events)) {
+                // Calendar
+                const list = document.getElementById('calendar-list');
+                list.innerHTML = '';
+
+                const entries = Object.entries(data.events);
+                if (entries.length === 0) {
+                    list.innerHTML = '<div style="color: var(--text-dim); margin-top: 20px; font-size: 0.9rem;">Keine Termine in den nächsten Tagen</div>';
+                    return;
+                }
+
+                for (const [day, events] of entries) {
                     const header = document.createElement('div');
-                    header.className = 'day-label';
+                    header.className = 'day-header';
                     header.innerText = day;
-                    calList.appendChild(header);
+                    list.appendChild(header);
+
                     events.forEach(event => {
                         const item = document.createElement('div');
-                        item.className = 'agenda-item';
+                        item.className = 'event-item';
                         item.innerHTML = `
-                            <div class="color-tab" style="background-color: ${event.color}"></div>
-                            <div class="time-box">${event.time}</div>
+                            <div class="event-dot" style="background:${event.color}"></div>
+                            <div class="event-time">${event.time}</div>
                             <div class="event-title">${event.title}</div>
                         `;
-                        calList.appendChild(item);
+                        list.appendChild(item);
                     });
                 }
             })
-            .catch(err => console.error("Update error:", err));
+            .catch(err => console.error('Update error:', err));
     }
 
     setInterval(updateClock, 1000);
     setInterval(updateDashboard, 30000);
     updateClock();
     updateDashboard();
-    </script>
+</script>
 </body>
 </html>
