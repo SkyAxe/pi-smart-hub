@@ -25,7 +25,7 @@ body {
 
 .layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 380px 1fr;
     gap: 32px;
     height: 100%;
 }
@@ -224,4 +224,21 @@ body {
     font-size: 0.6rem;
     color: #1a2e20;
     letter-spacing: 2px;
+}
+.event-title.partner {
+    color: #c39bd3;
+}
+
+.partner-dot {
+    font-size: 0.7rem;
+    margin-left: 4px;
+    opacity: 0.8;
+}
+.partner-event {
+    border-color: rgba(155, 89, 182, 0.2);
+}
+
+.partner-event:hover {
+    background: rgba(155, 89, 182, 0.04);
+    border-color: rgba(155, 89, 182, 0.3);
 }

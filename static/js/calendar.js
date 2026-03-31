@@ -16,11 +16,11 @@ function renderCalendar(events) {
 
         dayEvents.forEach(ev => {
             const item = document.createElement('div');
-            item.className = 'event-item';
+            item.className = 'event-item' + (ev.is_partner ? ' partner-event' : '');
             item.innerHTML = `
                 <div class="event-bar" style="background:${ev.color}"></div>
                 <div class="event-time">${ev.time}</div>
-                <div class="event-title">${ev.title}</div>
+                <div class="event-title ${ev.is_partner ? 'partner' : ''}">${ev.title}</div>
             `;
             list.appendChild(item);
         });
