@@ -35,7 +35,7 @@ def ask_claude(question, context=None):
 
     response = client.messages.create(
         model=model,
-        max_tokens=300,
+        max_tokens=250,
         system=SYSTEM_PROMPT,
         messages=messages
     )
