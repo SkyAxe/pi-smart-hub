@@ -1,16 +1,22 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
+from flask_socketio import SocketIO, emit
 import datetime
 import os
 import json
+import threading
 from flask import Response
 from dotenv import load_dotenv
 from modules.weather import WeatherModule
 from modules.calendar import CalendarModule
 from modules.sensors import IndoorSensor
+from modules.voice import VoiceModule
+from modules.claude_ai import ask_claude
 
 load_dotenv()
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'smarthub'
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 weather = WeatherModule(city="Leipzig", api_key=os.getenv("OPENWEATHER_API_KEY"))
 calendar = CalendarModule()
@@ -50,5 +56,36 @@ def get_data():
         mimetype='application/json'
     )
 
+def on_voice_trigger(command):
+    """Called when trigger word detected"""
+    socketio.emit('claude_thinking', {'status': 'thinking'})
+    
+    try:
+        # Get current context
+        weather_data = weather.get_data()
+        indoor_data = indoor.get_reading() or {"temp": "--", "hum": "--"}
+        context = f"Aktuelle Wetterdaten: {weather_data}. Innenklima: {indoor_data}."
+        
+        if not command:
+            command = "Hallo, was kann ich für dich tun?"
+
+        result = ask_claude(command, context)
+        
+        socketio.emit('claude_response', {
+            'text': result['text'],
+            'model': result['model'],
+            'command': command
+        })
+    except Exception as e:
+        socketio.emit('claude_response', {
+            'text': f'Fehler: {str(e)}',
+            'model': 'error',
+            'command': command
+        })
+    finally:
+        voice.set_processing_done()
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    voice = VoiceModule(on_trigger_callback=on_voice_trigger)
+    voice.start()
+    socketio.run(app, host='0.0.0.0', port=5000)
