@@ -15,11 +15,12 @@ MIC_INDEX = 1
 SAMPLE_RATE = 48000
 
 class VoiceModule:
-    def __init__(self, on_trigger_callback):
+    def __init__(self, on_trigger_callback, on_listening_callback=None):
         self.recognizer = sr.Recognizer()
         self.recognizer.energy_threshold = 1500
         self.recognizer.dynamic_energy_threshold = False
         self.on_trigger = on_trigger_callback
+        self.on_listening = on_listening_callback
         self.is_listening = False
         self.is_processing = False
         self.thread = None
@@ -91,6 +92,22 @@ class VoiceModule:
                         command = text.lower()
                         for trigger in TRIGGER_WORDS:
                             command = command.replace(trigger, "").strip()
+    
+                        # Falls kein Command nach Trigger — nochmal zuhören
+                        if not command:
+                            if self.on_listening:
+                                self.on_listening()
+                            print("Warte auf Command...", flush=True)
+                            try:
+                                with mic as source:
+                                    audio = self.recognizer.listen(source, timeout=5, phrase_time_limit=8)
+                                os.dup2(old_stderr, 2)
+                                command = self.recognizer.recognize_google(audio, language='de-DE')
+                                print(f"Command: {command}", flush=True)
+                            except Exception as e:
+                                os.dup2(old_stderr, 2)
+                                command = "Was kann ich für dich tun?"
+
                         print(f"TRIGGER! Command: '{command}'", flush=True)
                         self.is_processing = True
                         self.on_trigger(command)

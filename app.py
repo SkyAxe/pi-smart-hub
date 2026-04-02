@@ -85,6 +85,14 @@ def on_voice_trigger(command):
     finally:
         voice.set_processing_done()
 
+def on_listening():
+    socketio.emit('claude_listening', {})
+
+voice = VoiceModule(
+    on_trigger_callback=on_voice_trigger,
+    on_listening_callback=on_listening
+)
+
 if __name__ == '__main__':
     voice = VoiceModule(on_trigger_callback=on_voice_trigger)
     voice.start()

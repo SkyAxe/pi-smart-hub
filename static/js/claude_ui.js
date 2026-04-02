@@ -1,7 +1,7 @@
 const socket = io();
-
 const claudeStatus = document.getElementById('claude-status');
 const claudePulse = document.querySelector('.claude-pulse');
+const claudeZone = document.querySelector('.claude-zone');
 
 socket.on('connect', () => {
     console.log('WebSocket connected');
@@ -12,40 +12,57 @@ socket.on('claude_thinking', () => {
     claudePulse.style.animationDuration = '0.5s';
     claudeStatus.textContent = 'Denke nach...';
     claudeStatus.style.color = '#f59e0b';
+    claudeStatus.style.fontStyle = 'normal';
+    claudeZone.style.alignItems = 'flex-start';
 });
 
 socket.on('claude_response', (data) => {
-    // Reset pulse
     claudePulse.style.background = '#8b5cf6';
     claudePulse.style.animationDuration = '3s';
-    claudeStatus.style.color = 'var(--text-mid)';
-
-    // Show response
+    claudeStatus.style.color = 'var(--text)';
+    claudeStatus.style.fontStyle = 'normal';
+    claudeStatus.style.fontSize = '0.85rem';
+    claudeStatus.style.lineHeight = '1.5';
     claudeStatus.textContent = data.text;
+    claudeZone.style.alignItems = 'flex-start';
 
-    // Play confirmation sound
+    // Ton über ALSA direkt
     playConfirmSound();
 
-    // Reset after 15 seconds
     setTimeout(() => {
         claudeStatus.textContent = 'Bereit · Sag "Hey Claude"';
         claudeStatus.style.color = 'var(--text-dim)';
-    }, 15000);
+        claudeStatus.style.fontStyle = 'italic';
+        claudeStatus.style.fontSize = '0.78rem';
+        claudeZone.style.alignItems = 'center';
+    }, 20000);
+});
+
+socket.on('claude_listening', () => {
+    claudePulse.style.background = '#2ecc71';
+    claudePulse.style.animationDuration = '0.8s';
+    claudeStatus.textContent = 'Höre zu...';
+    claudeStatus.style.color = '#2ecc71';
+    claudeStatus.style.fontStyle = 'normal';
 });
 
 function playConfirmSound() {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    
-    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
-    oscillator.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
-    gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    
-    oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + 0.3);
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Kurzer doppelter Ton
+        [0, 0.15].forEach((delay, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = i === 0 ? 880 : 1100;
+            gain.gain.setValueAtTime(0.15, ctx.currentTime + delay);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.2);
+            osc.start(ctx.currentTime + delay);
+            osc.stop(ctx.currentTime + delay + 0.2);
+        });
+    } catch(e) {
+        console.log('Audio nicht verfügbar:', e);
+    }
 }
