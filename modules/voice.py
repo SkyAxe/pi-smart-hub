@@ -92,21 +92,28 @@ class VoiceModule:
                         command = text.lower()
                         for trigger in TRIGGER_WORDS:
                             command = command.replace(trigger, "").strip()
-    
-                        # Falls kein Command nach Trigger — nochmal zuhören
-                        if not command:
-                            if self.on_listening:
-                                self.on_listening()
-                            print("Warte auf Command...", flush=True)
-                            try:
-                                with mic as source:
-                                    audio = self.recognizer.listen(source, timeout=5, phrase_time_limit=8)
-                                os.dup2(old_stderr, 2)
-                                command = self.recognizer.recognize_google(audio, language='de-DE')
-                                print(f"Command: {command}", flush=True)
-                            except Exception as e:
-                                os.dup2(old_stderr, 2)
-                                command = "Was kann ich für dich tun?"
+
+                        # IMMER nochmal zuhören für vollständige Frage
+                        if self.on_listening:
+                            self.on_listening()
+                        print("Warte auf vollstaendige Frage...", flush=True)
+                        time.sleep(0.5)  # kurze Pause
+                        try:
+                            with mic as source:
+                                audio = self.recognizer.listen(source, timeout=8, phrase_time_limit=10)
+                            os.dup2(old_stderr, 2)
+                            full_command = self.recognizer.recognize_google(audio, language='de-DE')
+                            print(f"Vollstaendige Frage: {full_command}", flush=True)
+                            command = full_command  # überschreibe mit vollständiger Frage
+                        except sr.WaitTimeoutError:
+                            print("Timeout bei Frage", flush=True)
+                            if not command:
+                                command = "Was kann ich fuer dich tun?"
+                        except Exception as e:
+                            os.dup2(old_stderr, 2)
+                            print(f"Fehler: {e}", flush=True)
+                            if not command:
+                                command = "Was kann ich fuer dich tun?"
 
                         print(f"TRIGGER! Command: '{command}'", flush=True)
                         self.is_processing = True

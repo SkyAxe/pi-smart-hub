@@ -3,6 +3,35 @@ const claudeStatus = document.getElementById('claude-status');
 const claudePulse = document.querySelector('.claude-pulse');
 const claudeZone = document.querySelector('.claude-zone');
 
+let audioCtx = null;
+
+function unlockAudio() {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Stiller Ton um Audio zu entsperren
+    const buf = audioCtx.createBuffer(1, 1, 22050);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
+    document.getElementById('audio-unlock').style.display = 'none';
+    console.log('Audio entsperrt');
+}
+
+function playConfirmSound() {
+    if (!audioCtx) return;
+    [0, 0.15].forEach((delay, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = i === 0 ? 880 : 1100;
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + 0.2);
+        osc.start(audioCtx.currentTime + delay);
+        osc.stop(audioCtx.currentTime + delay + 0.2);
+    });
+}
+
 socket.on('connect', () => {
     console.log('WebSocket connected');
 });
