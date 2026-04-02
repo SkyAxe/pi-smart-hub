@@ -17,7 +17,7 @@ SAMPLE_RATE = 48000
 class VoiceModule:
     def __init__(self, on_trigger_callback):
         self.recognizer = sr.Recognizer()
-        self.recognizer.energy_threshold = 500
+        self.recognizer.energy_threshold = 1500
         self.recognizer.dynamic_energy_threshold = False
         self.on_trigger = on_trigger_callback
         self.is_listening = False
@@ -35,9 +35,24 @@ class VoiceModule:
 
     def _contains_trigger(self, text):
         text_lower = text.lower()
-        for trigger in TRIGGER_WORDS:
+    
+        # Exakte Treffer
+        exact_triggers = ["hey claude", "hallo claude", "claude"]
+        for trigger in exact_triggers:
             if trigger in text_lower:
                 return True
+    
+        # Fuzzy Treffer - häufige Mishearings abfangen
+        fuzzy_triggers = [
+            "hey claud", "hey klaud", "hey cloud",
+            "hey klaus", "hallo klaud", "hallo cloud",
+            "hey glad", "hey klaude", "a claude",
+            "hey claw", "he claude"
+        ]
+        for trigger in fuzzy_triggers:
+            if trigger in text_lower:
+                return True
+    
         return False
 
     def _listen_loop(self):
