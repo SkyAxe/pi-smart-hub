@@ -47,10 +47,9 @@ class VoiceModule:
             
             # Kalibrieren
             print("Kalibriere...", flush=True)
-            with mic as source:
-                self.recognizer.adjust_for_ambient_noise(source, duration=1)
-            print(f"Kalibriert! Threshold: {self.recognizer.energy_threshold}", flush=True)
             self.recognizer.energy_threshold = 500
+            self.recognizer.dynamic_energy_threshold = False
+            print(f"Kalibriert! Threshold: {self.recognizer.energy_threshold}", flush=True)
             
             while self.is_listening:
                 if self.is_processing:
