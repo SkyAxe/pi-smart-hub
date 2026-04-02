@@ -35,7 +35,10 @@ class VoiceModule:
         mic = sr.Microphone(device_index=MIC_INDEX, sample_rate=SAMPLE_RATE)
         with mic as source:
             self.recognizer.adjust_for_ambient_noise(source, duration=1)
-            print("Calibrated, ready for trigger word...")
+            # Fix: energy threshold manuell setzen
+            self.recognizer.energy_threshold = 500
+            self.recognizer.dynamic_energy_threshold = False
+            print(f"Calibrated, energy threshold: {self.recognizer.energy_threshold}")
 
         while self.is_listening:
             if self.is_processing:
@@ -48,11 +51,9 @@ class VoiceModule:
                 print(f"Heard: {text}")
 
                 if self._contains_trigger(text):
-                    # Extract command after trigger word
                     command = text.lower()
                     for trigger in TRIGGER_WORDS:
                         command = command.replace(trigger, "").strip()
-
                     print(f"Trigger detected! Command: {command}")
                     self.is_processing = True
                     self.on_trigger(command)
