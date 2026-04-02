@@ -45,6 +45,7 @@ def get_data():
         "indoor_hum": indoor_data["hum"],
         "feels_like": weather_data["feels_like"],
         "humidity": weather_data["humidity"],
+        "wind": weather_data["wind"],
         "icon": weather_data["icon"],
         "news": weather_data["desc"],
         "events": events

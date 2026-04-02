@@ -3,10 +3,11 @@ function updateDashboard() {
         .then(r => r.json())
         .then(data => {
             // Weather
-            document.getElementById('temp').innerText = data.temp;
-            document.getElementById('feels').innerText = data.feels_like;
-            document.getElementById('humidity').innerText = data.humidity;
+            document.getElementById('temp').innerText        = data.temp;
+            document.getElementById('feels').innerText       = data.feels_like;
+            document.getElementById('humidity').innerText    = data.humidity;
             document.getElementById('weather-desc').innerText = data.news;
+            document.getElementById('wind').innerText        = data.wind || '--';
 
             if (data.icon) {
                 const icon = document.getElementById('weather-icon');
@@ -16,7 +17,7 @@ function updateDashboard() {
 
             // Indoor
             document.getElementById('indoor-temp').innerText = data.indoor_temp;
-            document.getElementById('indoor-hum').innerText =
+            document.getElementById('indoor-hum').innerText  =
                 data.indoor_hum === '--' ? '--' : data.indoor_hum + '%';
 
             // Calendar

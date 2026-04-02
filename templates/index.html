@@ -8,9 +8,9 @@
 </head>
 <body>
 
-<div id="audio-unlock" onclick="unlockAudio()" 
-     style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7)">
-    <div style="color:#2ecc71;font-size:1.2rem;letter-spacing:3px;text-transform:uppercase;">
+<div id="audio-unlock" onclick="unlockAudio()"
+     style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.75)">
+    <div style="color:#2ecc71;font-size:1.1rem;letter-spacing:4px;text-transform:uppercase;border:1px solid rgba(46,204,113,0.3);padding:16px 32px;border-radius:12px;">
         Tippen zum Starten
     </div>
 </div>
@@ -30,7 +30,11 @@
             </div>
             <div id="weather-desc" class="weather-desc">Wetter lädt...</div>
             <div class="weather-meta">
-                Gefühlt <span id="feels">--</span> &nbsp;·&nbsp; <span id="humidity">--</span> Feuchte
+                Gefühlt <span id="feels">--</span>
+                &nbsp;·&nbsp;
+                <span id="humidity">--</span> Feuchte
+                &nbsp;·&nbsp;
+                <span id="wind">--</span> Wind
             </div>
 
             <div class="card-divider"></div>
@@ -47,7 +51,7 @@
             </div>
         </div>
 
-        <div class="claude-zone">
+        <div class="claude-zone" data-state="idle">
             <div class="claude-pulse"></div>
             <div class="claude-text" id="claude-status">Bereit · Sag "Hey Claude"</div>
         </div>
@@ -61,7 +65,7 @@
     </div>
 </div>
 
-<div class="footer">SMART HUB · EXAYKS</div>
+<div class="footer">Smart Hub · Exayks</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 <script src="/static/js/clock.js"></script>
