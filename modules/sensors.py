@@ -1,8 +1,18 @@
 # -*- coding: utf-8 -*-
-import board, adafruit_dht, threading
+import threading
+
+try:
+    import board, adafruit_dht
+    _PI = True
+except (ImportError, NotImplementedError):
+    _PI = False
 
 class IndoorSensor:
     def __init__(self):
+        if not _PI:
+            print("Sensor: kein Pi erkannt – nutze Mockdaten")
+            self._ok = False
+            return
         try:
             self.sensor = adafruit_dht.DHT11(board.D4)
             self._ok = True
@@ -11,6 +21,8 @@ class IndoorSensor:
             self._ok = False
 
     def get_reading(self):
+        if not _PI:
+            return {"temp": 22.5, "hum": 55}  # Mock für lokale Entwicklung
         if not self._ok:
             return {"temp": None, "hum": None}
         result = {}
