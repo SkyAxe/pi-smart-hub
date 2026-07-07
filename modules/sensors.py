@@ -1,25 +1,28 @@
 # -*- coding: utf-8 -*-
-import board
-import adafruit_dht
+import board, adafruit_dht, threading
 
 class IndoorSensor:
     def __init__(self):
         try:
             self.sensor = adafruit_dht.DHT11(board.D4)
-            self._available = True
+            self._ok = True
         except Exception as e:
             print(f"Sensor init failed: {e}")
-            self._available = False
+            self._ok = False
 
     def get_reading(self):
-        if not self._available:
+        if not self._ok:
             return {"temp": None, "hum": None}
-        try:
-            temp = self.sensor.temperature
-            hum  = self.sensor.humidity
-            if temp is not None and hum is not None:
-                return {"temp": round(temp, 1), "hum": round(hum)}
-            return {"temp": None, "hum": None}
-        except Exception as e:
-            print(f"Sensor read error: {e}")
-            return {"temp": None, "hum": None}
+        result = {}
+        def read():
+            try:
+                t, h = self.sensor.temperature, self.sensor.humidity
+                if t is not None and h is not None:
+                    result["temp"] = round(t, 1)
+                    result["hum"]  = round(h)
+            except Exception as e:
+                print(f"Sensor error: {e}")
+        thread = threading.Thread(target=read, daemon=True)
+        thread.start()
+        thread.join(timeout=3.0)
+        return {"temp": result.get("temp"), "hum": result.get("hum")}
