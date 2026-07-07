@@ -123,7 +123,7 @@ body::after {
 .vdiv {
   background: var(--border);
   align-self: stretch;
-  margin: 0 30px;
+  margin: 0 20px;
 }
 
 .panel { overflow: hidden; }
@@ -209,6 +209,9 @@ body::after {
   flex-direction: column;
   gap: 28px;
 }
+
+#s-temp:empty::before,
+#s-hum:empty::before { content: '--'; }
 
 .sensor-value {
   font-family: var(--mono);
