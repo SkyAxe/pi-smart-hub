@@ -123,10 +123,10 @@ body::after {
 .vdiv {
   background: var(--border);
   align-self: stretch;
-  margin: 0 20px;
+  margin: 0 28px;
 }
 
-.panel { overflow: hidden; }
+.panel { overflow: hidden; padding-right: 8px; }
 
 .panel-label {
   font-size: 9px;
