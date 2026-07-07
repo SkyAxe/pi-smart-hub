@@ -1,76 +1,91 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Hub Dashboard</title>
-    <link rel="stylesheet" href="/static/css/dashboard.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pi Smart Hub</title>
+  <link rel="stylesheet" href="/static/css/dashboard.css">
 </head>
 <body>
 
-<div id="audio-unlock" onclick="unlockAudio()"
-     style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.75)">
-    <div style="color:#2ecc71;font-size:1.1rem;letter-spacing:4px;text-transform:uppercase;border:1px solid rgba(46,204,113,0.3);padding:16px 32px;border-radius:12px;">
-        Tippen zum Starten
+<div class="hub">
+
+  <header class="hub-header">
+    <div class="clock">
+      <span id="clock-h">--</span><span id="colon">:</span><span id="clock-m">--</span>
     </div>
+    <div class="header-meta">
+      <div id="date-display">Lädt...</div>
+      <div class="location-line">Leipzig &thinsp;·&thinsp; Deutschland</div>
+    </div>
+  </header>
+
+  <div class="hub-body">
+
+    <section class="panel">
+      <div class="panel-label">Draussen</div>
+      <div class="weather-temp-row">
+        <span id="w-temp" class="weather-temp">--</span>
+        <span class="weather-unit">°C</span>
+      </div>
+      <div id="w-desc" class="weather-desc">Wetter lädt...</div>
+      <div class="weather-rows">
+        <div class="weather-row">
+          <span class="row-label">Gefühlt</span>
+          <span id="w-feels" class="row-value">--</span>
+        </div>
+        <div class="weather-row">
+          <span class="row-label">Luftfeuchtigkeit</span>
+          <span id="w-hum" class="row-value">--</span>
+        </div>
+        <div class="weather-row">
+          <span class="row-label">Wind</span>
+          <span id="w-wind" class="row-value">--</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="vdiv"></div>
+
+    <section class="panel">
+      <div class="panel-label">Drinnen</div>
+      <div class="sensors">
+        <div>
+          <div class="sensor-value">
+            <span id="s-temp">--</span><span class="sensor-unit">°C</span>
+          </div>
+          <div class="sensor-label">Temperatur</div>
+        </div>
+        <div>
+          <div class="sensor-value">
+            <span id="s-hum">--</span><span class="sensor-unit">%</span>
+          </div>
+          <div class="sensor-label">Luftfeuchtigkeit</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="vdiv"></div>
+
+    <section class="panel">
+      <div class="panel-label">Kalender</div>
+      <div id="calendar-list"></div>
+    </section>
+
+  </div>
+
+  <footer class="hub-footer">
+    <div class="status-online">
+      <span class="dot"></span>
+      Pi Smart Hub &thinsp;·&thinsp; Online
+    </div>
+    <div id="last-update">--</div>
+  </footer>
+
 </div>
 
-<div class="layout">
-    <div class="left">
-        <div class="time-block">
-            <div id="clock" class="clock">00:00</div>
-            <div id="date" class="date">Lädt...</div>
-        </div>
-
-        <div class="card">
-            <div class="card-label">Leipzig · Außen</div>
-            <div class="weather-main">
-                <div id="temp" class="weather-temp">--</div>
-                <img id="weather-icon" src="" alt="">
-            </div>
-            <div id="weather-desc" class="weather-desc">Wetter lädt...</div>
-            <div class="weather-meta">
-                Gefühlt <span id="feels">--</span>
-                &nbsp;·&nbsp;
-                <span id="humidity">--</span> Feuchte
-                &nbsp;·&nbsp;
-                <span id="wind">--</span> Wind
-            </div>
-
-            <div class="card-divider"></div>
-
-            <div class="indoor-label">Innenklima</div>
-            <div class="indoor-row">
-                <div class="indoor-temp">
-                    <span id="indoor-temp">--</span><sup>°C</sup>
-                </div>
-                <div class="indoor-right">
-                    <div id="indoor-hum" class="hum-value">--%</div>
-                    <div class="hum-label">Luftfeuchte</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="claude-zone" data-state="idle">
-            <div class="claude-pulse"></div>
-            <div class="claude-text" id="claude-status">Bereit · Sag "Hey Claude"</div>
-        </div>
-    </div>
-
-    <div class="right">
-        <div class="cal-header">Kalender · Upcoming</div>
-        <div class="calendar-scroll">
-            <div id="calendar-list"></div>
-        </div>
-    </div>
-</div>
-
-<div class="footer">Smart Hub · Exayks</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 <script src="/static/js/clock.js"></script>
 <script src="/static/js/calendar.js"></script>
 <script src="/static/js/dashboard.js"></script>
-<script src="/static/js/claude_ui.js"></script>
 </body>
 </html>
